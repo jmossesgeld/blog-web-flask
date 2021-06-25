@@ -1,0 +1,61 @@
+{% include "header.html" %} {% import "bootstrap/wtf.html" as wtf %}
+
+<!-- Page Header -->
+<header class="masthead" style="background-image: url('{{post.img_url}}')">
+  <div class="overlay"></div>
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-8 col-md-10 mx-auto">
+        <div class="post-heading">
+          <h1>{{post.title}}</h1>
+          <h2 class="subheading">{{post.subtitle}}</h2>
+          <span class="meta"
+            >Posted by
+            <a href="#">{{post.author.username}}</a>
+            on {{post.date}}</span
+          >
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- Post Content -->
+<article>
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-8 col-md-10 mx-auto">
+        {{ post.body|safe }} {% if current_user.id == 1 or current_user.id == post.author_id %}
+        <hr />
+        <div class="clearfix">
+          <a class="btn btn-primary float-right" href="{{url_for('edit_post', post_id=post.id)}}">Edit Post</a>
+        </div>
+        {% endif %}
+        <!-- Comments Area -->
+        {% if current_user.is_authenticated %}
+        <hr />
+        {{ wtf.quick_form(form, novalidate=True, button_map={"submit": "primary"}) }} {% else %}
+        <strong style="color: red; margin-right: 15%">Please register/log in to post comments.</strong><a type="button" class="btn btn-secondary disabled">COMMENT</a>
+        {% endif %}
+        <div class="col-lg-8 col-md-10 mx-auto comment" style="text-align:left; margin:1rem">
+          <ul class="commentList">
+            {% for comment in comments: %}
+            <li>
+              <div class="commenterImage">
+                <img src="https://ui-avatars.com/api/?name={{ comment.author.username | replace(' ','+') }}" />
+              </div>
+              <div class="commentText">
+                <p>{{ comment.body | safe }}</p>
+                <span class="date sub-text">{{ comment.author.username }}</span>
+              </div>
+            </li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</article>
+
+<hr />
+{{ ckeditor.load() }} {{ ckeditor.config(name='body') }} {% include "footer.html" %}
